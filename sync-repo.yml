@@ -1,0 +1,25 @@
+name: Sync Repository
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs every 24 hours: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4 # https://github.com/actions/checkout?tab=readme-ov-file#checkout-v4
+        with:
+          repository: "<source-repository-url>"
+          token: ${{ secrets.SOURCE_REPO_TOKEN }}
+          persist-credentials: false # https://github.com/flwyd/adif-multitool/commit/99d2496869e25444f7d4d455abc9b0ac5cd044a5
+
+      - name: Push changes to the target repository
+        uses: ad-m/github-push-action@v0.8.0 # https://github.com/ad-m/github-push-action/releases/tag/v0.8.0
+        with:
+          github_token: ${{ secrets.TARGET_REPO_TOKEN }}
+          repository: "<target-repository-url>"
+          force: true
+          tags: true
